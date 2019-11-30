@@ -124,19 +124,62 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/add-issue-headings.ts":
+/*!***********************************!*\
+  !*** ./src/add-issue-headings.ts ***!
+  \***********************************/
+/*! exports provided: addIssueHeadings */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addIssueHeadings", function() { return addIssueHeadings; });
+function addIssueHeadings() {
+    var doc = DocumentApp.getActiveDocument();
+    var element = doc.getCursor().getElement();
+    var body = doc.getBody();
+    var bodyIndex = body.getChildIndex(element);
+    var startAt = parseInt(DocumentApp.getUi()
+        .prompt('Enter issue number to start at:')
+        .getResponseText());
+    var issueTemplate = '#%03d';
+    if (!isNaN(startAt)) {
+        var lastIssueNumber = startAt + 10;
+        for (var issueNumber = startAt; issueNumber < lastIssueNumber; issueNumber++) {
+            body
+                .insertParagraph(bodyIndex, Utilities.formatString(issueTemplate, issueNumber))
+                .setHeading(DocumentApp.ParagraphHeading.HEADING3);
+            bodyIndex += 1;
+        }
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/index.ts":
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {global.onOpen = onOpen;
-global.insertBrokenLink = insertBrokenLink;
-global.insertLinkToIssue = insertLinkToIssue;
-global.addIssueHeadings = addIssueHeadings;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _insert_broken_link__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./insert-broken-link */ "./src/insert-broken-link.ts");
+/* harmony import */ var _insert_link_to_issue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./insert-link-to-issue */ "./src/insert-link-to-issue.ts");
+/* harmony import */ var _add_issue_headings__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./add-issue-headings */ "./src/add-issue-headings.ts");
+
+
+
+global.onOpen = onOpen;
+global.insertBrokenLink = _insert_broken_link__WEBPACK_IMPORTED_MODULE_0__["insertBrokenLink"];
+global.insertLinkToIssue = _insert_link_to_issue__WEBPACK_IMPORTED_MODULE_1__["insertLinkToIssue"];
+global.addIssueHeadings = _add_issue_headings__WEBPACK_IMPORTED_MODULE_2__["addIssueHeadings"];
 function onOpen() {
-    // add utilities menu
+    createUtilitiesMenu();
+}
+function createUtilitiesMenu() {
     DocumentApp.getUi()
         .createMenu('Utilities')
         .addItem('Insert Broken Link Issue', 'insertBrokenLink')
@@ -146,13 +189,23 @@ function onOpen() {
         //    .addItem('Test new form', 'newBrokenLinkDialog')
         .addToUi();
 }
-// TODO: this is a work in progress 😉
-function newBrokenLinkDialog() {
-    var html = HtmlService.createHtmlOutputFromFile('broken-link');
-    //    .setWidth(300)
-    //    .setHeight(250)
-    DocumentApp.getUi().showModalDialog(html, 'New Broken Link Issue');
-}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node_modules/webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./src/insert-broken-link.ts":
+/*!***********************************!*\
+  !*** ./src/insert-broken-link.ts ***!
+  \***********************************/
+/*! exports provided: insertBrokenLink */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertBrokenLink", function() { return insertBrokenLink; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+
 function insertBrokenLink() {
     var cursor = DocumentApp.getActiveDocument().getCursor();
     var element = cursor.getElement();
@@ -163,19 +216,100 @@ function insertBrokenLink() {
     if (element.getType() != DocumentApp.ElementType.PARAGRAPH) {
         return;
     }
-    linkText = promptUserForLinkText();
+    linkText = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["promptUserForLinkText"])();
     if (!linkText) {
         return;
     }
-    ghLineUrl = promptUserForGithubLineURL();
+    ghLineUrl = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["promptUserForGithubLineURL"])();
     if (!ghLineUrl) {
         return;
     }
     // TODO: prompt user for bullet point annotation
     //  bulletPoint = promptUserForBulletPoint()
     newParagraphs = appendBrokenLinkToParagraph(element, linkText, ghLineUrl);
-    moveCursorToEndOfElement(newParagraphs[newParagraphs.length - 1]);
+    Object(_utils__WEBPACK_IMPORTED_MODULE_0__["moveCursorToEndOfElement"])(newParagraphs[newParagraphs.length - 1]);
 }
+function appendBrokenLinkToParagraph(paragraph, linkText, ghLineUrl) {
+    var parent = paragraph.getParent();
+    var i = parent.getChildIndex(paragraph);
+    return [
+        paragraph.appendText(Utilities.formatString(' - Broken link: %s', linkText)),
+        parent.insertParagraph(i + 1, ghLineUrl).setLinkUrl(ghLineUrl),
+        parent.insertParagraph(i + 2, ''),
+        parent.insertParagraph(i + 3, Utilities.formatString('"%s" link redirects to 404 page on GitHub. (GitHub paths are case sensitive.)', linkText)),
+        parent.insertParagraph(i + 4, '')
+    ];
+}
+
+
+/***/ }),
+
+/***/ "./src/insert-link-to-issue.ts":
+/*!*************************************!*\
+  !*** ./src/insert-link-to-issue.ts ***!
+  \*************************************/
+/*! exports provided: insertLinkToIssue */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertLinkToIssue", function() { return insertLinkToIssue; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+
+function insertLinkToIssue() {
+    var cursor = DocumentApp.getActiveDocument().getCursor();
+    var element = cursor.getElement();
+    var linkText = '';
+    var ghLineUrl = '';
+    var targetPath = '';
+    var newParagraphs = [];
+    if (element.getType() != DocumentApp.ElementType.PARAGRAPH) {
+        return;
+    }
+    linkText = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["promptUserForLinkText"])();
+    if (!linkText) {
+        return;
+    }
+    ghLineUrl = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["promptUserForGithubLineURL"])();
+    if (!ghLineUrl) {
+        return;
+    }
+    targetPath = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["promptUserForTargetPath"])();
+    if (!targetPath) {
+        return;
+    }
+    newParagraphs = appendLinkToIssueToParagraph(element, linkText, ghLineUrl, targetPath);
+    Object(_utils__WEBPACK_IMPORTED_MODULE_0__["moveCursorToEndOfElement"])(newParagraphs[newParagraphs.length - 1]);
+}
+function appendLinkToIssueToParagraph(paragraph, linkText, ghLineUrl, targetPath) {
+    var parent = paragraph.getParent();
+    var i = parent.getChildIndex(paragraph);
+    return [
+        paragraph.appendText(Utilities.formatString(' - Link to %s', linkText)),
+        parent.insertParagraph(i + 1, ghLineUrl).setLinkUrl(ghLineUrl),
+        parent.insertParagraph(i + 2, ''),
+        parent.insertParagraph(i + 3, Utilities.formatString('"%s" should link to %s.', linkText, targetPath.replace(/\\/gi, '/'))),
+        parent.insertParagraph(i + 4, '')
+    ];
+}
+
+
+/***/ }),
+
+/***/ "./src/utils.ts":
+/*!**********************!*\
+  !*** ./src/utils.ts ***!
+  \**********************/
+/*! exports provided: promptUserForGithubLineURL, promptUserForLinkText, promptUserForBulletPoint, moveCursorToEndOfElement, promptUserForTargetPath */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promptUserForGithubLineURL", function() { return promptUserForGithubLineURL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promptUserForLinkText", function() { return promptUserForLinkText; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promptUserForBulletPoint", function() { return promptUserForBulletPoint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moveCursorToEndOfElement", function() { return moveCursorToEndOfElement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promptUserForTargetPath", function() { return promptUserForTargetPath; });
 function promptUserForGithubLineURL() {
     var ui = DocumentApp.getUi();
     var response = ui.prompt('Enter the url for the GitHub source code line:');
@@ -199,45 +333,9 @@ function promptUserForBulletPoint() {
     var button = ui.alert('Add a bullet point annotation to link?', ui.ButtonSet.YES_NO);
     return button == ui.Button.YES;
 }
-function appendBrokenLinkToParagraph(paragraph, linkText, ghLineUrl) {
-    var parent = paragraph.getParent();
-    var i = parent.getChildIndex(paragraph);
-    return [
-        paragraph.appendText(Utilities.formatString(' - Broken link: %s', linkText)),
-        parent.insertParagraph(i + 1, ghLineUrl).setLinkUrl(ghLineUrl),
-        parent.insertParagraph(i + 2, ''),
-        parent.insertParagraph(i + 3, Utilities.formatString('"%s" link redirects to 404 page on GitHub. (GitHub paths are case sensitive.)', linkText)),
-        parent.insertParagraph(i + 4, '')
-    ];
-}
 function moveCursorToEndOfElement(element) {
     var position = DocumentApp.getActiveDocument().newPosition(element, element.getText().length);
     DocumentApp.getActiveDocument().setCursor(position);
-}
-function insertLinkToIssue() {
-    var cursor = DocumentApp.getActiveDocument().getCursor();
-    var element = cursor.getElement();
-    var linkText = '';
-    var ghLineUrl = '';
-    var targetPath = '';
-    var newParagraphs = [];
-    if (element.getType() != DocumentApp.ElementType.PARAGRAPH) {
-        return;
-    }
-    linkText = promptUserForLinkText();
-    if (!linkText) {
-        return;
-    }
-    ghLineUrl = promptUserForGithubLineURL();
-    if (!ghLineUrl) {
-        return;
-    }
-    targetPath = promptUserForTargetPath();
-    if (!targetPath) {
-        return;
-    }
-    newParagraphs = appendLinkToIssueToParagraph(element, linkText, ghLineUrl, targetPath);
-    moveCursorToEndOfElement(newParagraphs[newParagraphs.length - 1]);
 }
 function promptUserForTargetPath() {
     var ui = DocumentApp.getUi();
@@ -248,72 +346,7 @@ function promptUserForTargetPath() {
     }
     return result;
 }
-function appendLinkToIssueToParagraph(paragraph, linkText, ghLineUrl, targetPath) {
-    var parent = paragraph.getParent();
-    var i = parent.getChildIndex(paragraph);
-    return [
-        paragraph.appendText(Utilities.formatString(' - Link to %s', linkText)),
-        parent.insertParagraph(i + 1, ghLineUrl).setLinkUrl(ghLineUrl),
-        parent.insertParagraph(i + 2, ''),
-        parent.insertParagraph(i + 3, Utilities.formatString('"%s" should link to %s.', linkText, targetPath.replace(/\\/gi, '/'))),
-        parent.insertParagraph(i + 4, '')
-    ];
-}
-function addIssueHeadings() {
-    var doc = DocumentApp.getActiveDocument();
-    var element = doc.getCursor().getElement();
-    var body = doc.getBody();
-    var bodyIndex = body.getChildIndex(element);
-    var startAt = parseInt(DocumentApp.getUi()
-        .prompt('Enter issue number to start at:')
-        .getResponseText());
-    var issueTemplate = '#%03d';
-    if (!isNaN(startAt)) {
-        var lastIssueNumber = startAt + 10;
-        for (var issueNumber = startAt; issueNumber < lastIssueNumber; issueNumber++) {
-            body
-                .insertParagraph(bodyIndex, Utilities.formatString(issueTemplate, issueNumber))
-                .setHeading(DocumentApp.ParagraphHeading.HEADING3);
-            bodyIndex += 1;
-        }
-    }
-}
-function isNaN(value) {
-    return typeof value === 'number' && value !== value;
-}
-function insertBootstrapIssue() {
-    var response;
-    var doc = DocumentApp.getActiveDocument();
-    var element = doc.getCursor().getElement();
-    var activityTitle = '';
-    var lessonPlanLink = '';
-    var ghPermalinkUrl = '';
-    var ghLineNumber = '';
-    var ghLineLabel = '';
-    var shouldGetPermalink = true;
-    var lineLinks = [];
-    var ui = DocumentApp.getUi();
-    if (element.getType() != DocumentApp.ElementType.PARAGRAPH) {
-        return;
-    }
-    // prompt user for lesson plan link
-    response = ui.prompt('Enter link to lesson plan section:');
-    if (response.getSelectedButton() != ui.Button.OK) {
-        return;
-    }
-    lessonPlanLink = response.getResponseText();
-    // prompt user for name of activity
-    // while shouldGetPermalink
-    // get gh line permalink
-    // get text for line permalink
-    // calculate line number form permalink
-    // add to linkLinks
-    // ask user if there is another permalink and set shouldGetPermalink
-    // end while
-    // TODO: finish pseudocode
-}
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node_modules/webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ })
 

@@ -1,0 +1,32 @@
+{
+  "name": "qa-utils",
+  "version": "1.0.0",
+  "description": "My webpack project",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.7",
+    "@webpack-cli/init": "^0.2.2",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "copy-webpack-plugin": "^5.0.5",
+    "gas-webpack-plugin": "^1.0.2",
+    "terser-webpack-plugin": "^2.2.1",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "workbox-webpack-plugin": "^4.3.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "keywords": [
+    "ga",
+    "google-apps-script",
+    "clasp",
+    "typescript"
+  ],
+  "author": "John Desrosiers",
+  "license": "MIT"
+}

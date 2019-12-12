@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+clasp setting scriptId 1TGCN29pg_ViiJ9Uy9FnkCTnC03Z2uWPJEyVh_KucU5UXijnnn2BeUbfm
+clasp push
+clasp setting scriptId 1VI3Jg3pRMTDRyTkIt5QMlBVvefBm55fmc6XrUsOifAaLJDZ3lMGbNfa1
+clasp push
+clasp setting scriptId 1FMFytfkHUKJBsjGWPB4wH_AzhmADHBdu5GYQhpglutpXRyYLKCDuGT1o
+clasp push
+clasp setting scriptId 1BVsiuVL9DgzCo9hP7-vnV4fbEzKB3RKK2oMtlak3kVfnYDgxrHE--zVd
+clasp push

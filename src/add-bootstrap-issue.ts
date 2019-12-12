@@ -86,6 +86,10 @@ function insertIssue(issue: BootstrapIssue) {
   insertIssueBody(index + 3)
 
   function insertHeading(index) {
+    let issueNumber = issue.number.toString()
+    while (issueNumber.length < 3) {
+      issueNumber = '0' + issueNumber
+    }
     const paragraph = body.insertParagraph(
       index,
       `#${issue.number} - Update Bootstrap version: ${issue.title}`

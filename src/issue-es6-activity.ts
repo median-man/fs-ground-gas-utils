@@ -3,18 +3,15 @@
   activity to use ES6 syntax.
 */
 import { insertActivityLink } from './insert-activity-link'
+import { CreateIssue } from './create-issue'
 
-class IssueES6Activity {
-  private DocumentApp: GoogleAppsScript.Document.DocumentApp
-  private ui: GoogleAppsScript.Base.Ui
-
+class IssueES6Activity extends CreateIssue {
   constructor(options: { DocumentApp: GoogleAppsScript.Document.DocumentApp }) {
-    this.DocumentApp = options.DocumentApp
-    this.ui = options.DocumentApp.getUi()
+    super(options)
   }
 
   execute() {
-    const cursor = this.DocumentApp.getActiveDocument().getCursor()
+    const cursor = this.getCursor()
     if (!cursor) {
       return
     }
@@ -35,14 +32,8 @@ class IssueES6Activity {
     this.moveCursor(paragraph, 1)
   }
 
-  moveCursor(element, offset) {
-    const doc = this.DocumentApp.getActiveDocument()
-    const newPosition = doc.newPosition(element, offset)
-    doc.setCursor(newPosition)
-  }
-
   insertIssueBodyAtPosition(position: GoogleAppsScript.Document.Position) {
-    const body = DocumentApp.getActiveDocument().getBody()
+    const body = this.document.getBody()
     const index = body.getChildIndex(position.getElement()) + 1
     const issueText =
       'Refactor the code in this activity with the ES6 syntax that was covered in previous units. (e.g. let/const, arrow functions, promises, etc…)'

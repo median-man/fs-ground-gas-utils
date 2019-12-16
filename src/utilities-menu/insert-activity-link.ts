@@ -1,8 +1,10 @@
-import { CreateIssue } from './create-issue'
+class InsertActivityLink {
+  private DocumentApp: GoogleAppsScript.Document.DocumentApp
+  private ui: GoogleAppsScript.Base.Ui
 
-class InsertActivityLink extends CreateIssue {
   constructor(options: { DocumentApp: GoogleAppsScript.Document.DocumentApp }) {
-    super(options)
+    this.DocumentApp = options.DocumentApp
+    this.ui = options.DocumentApp.getUi()
   }
 
   execute() {
@@ -31,7 +33,7 @@ class InsertActivityLink extends CreateIssue {
   }
 
   insertLinkAtCursor(url: string, text: string) {
-    const cursor = this.getCursor()
+    const cursor = this.DocumentApp.getActiveDocument().getCursor()
     if (!cursor) {
       return
     }
@@ -48,6 +50,12 @@ class InsertActivityLink extends CreateIssue {
     )
 
     this.moveCursor(textElement, linkRange.getEndOffsetInclusive() + 1)
+  }
+
+  moveCursor(element, offset) {
+    const doc = this.DocumentApp.getActiveDocument()
+    const newPosition = doc.newPosition(element, offset)
+    doc.setCursor(newPosition)
   }
 }
 

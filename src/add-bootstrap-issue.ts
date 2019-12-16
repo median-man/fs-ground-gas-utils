@@ -1,5 +1,4 @@
 interface BootstrapIssue {
-  number: number
   title: string
   ghUrl: string
   ghLineUrls: string[]
@@ -15,19 +14,12 @@ export function addBootstrapUpdateIssue() {
 function createBootstrapIssueDialog(): BootstrapIssue {
   const promptTitle = 'Create Bootstrap Update Issue'
   const result: BootstrapIssue = {
-    number: -1,
     title: '',
     ghUrl: '',
     ghLineUrls: []
   }
   let response: GoogleAppsScript.Base.PromptResponse
   const ui = DocumentApp.getUi()
-
-  response = promptForIssueNumber()
-  if (!isResponseOk(response)) {
-    return null
-  }
-  result.number = parseInt(response.getResponseText())
 
   response = promptForGhUrl()
   if (!isResponseOk(response)) {
@@ -57,10 +49,6 @@ function createBootstrapIssueDialog(): BootstrapIssue {
     return ui.prompt(promptTitle, promptText, ui.ButtonSet.OK_CANCEL)
   }
 
-  function promptForIssueNumber() {
-    return promptUser('What is the issue number?')
-  }
-
   function promptForGhUrl() {
     return promptUser('What is the GitHub URL for the activity/assignment?')
   }
@@ -80,21 +68,13 @@ function insertIssue(issue: BootstrapIssue) {
   const position = DocumentApp.getActiveDocument().getCursor()
   const body = DocumentApp.getActiveDocument().getBody()  
   let index = body.getChildIndex(position.getElement())
-  insertHeading(index)
+  insertHeadingAtPosition(position)
   insertGhLink(index + 1)
   insertBlankLine(index + 2)
   insertIssueBody(index + 3)
 
-  function insertHeading(index) {
-    let issueNumber = issue.number.toString()
-    while (issueNumber.length < 3) {
-      issueNumber = '0' + issueNumber
-    }
-    const paragraph = body.insertParagraph(
-      index,
-      `#${issue.number} - Update Bootstrap version: ${issue.title}`
-    )
-    paragraph.setHeading(DocumentApp.ParagraphHeading.HEADING3)
+  function insertHeadingAtPosition(position: GoogleAppsScript.Document.Position) {
+    position.insertText(` - Update Bootstrap version: ${issue.title}`)
   }
 
   function insertGhLink(index) {

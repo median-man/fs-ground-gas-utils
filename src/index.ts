@@ -31,7 +31,6 @@ function createUtilitiesMenu() {
     { text: 'Insert Link To Issue', onClick: 'insertLinkToIssue' },
     { text: 'Add issue headings', onClick: 'addIssueHeadings' },
     { text: 'Bootstrap Update Issue', onClick: 'addBootstrapUpdateIssue' },
-    { text: 'Bootstrap Update Issue', onClick: 'addBootstrapUpdateIssue' },
     { text: 'Insert Activity Link', onClick: 'insertActivityLink' },
     { text: 'ES6 Activity Refactor Issue', onClick: 'createES6ActivityIssue' }
   ]

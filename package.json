@@ -23,7 +23,8 @@
   "scripts": {
     "test": "jest",
     "build": "webpack",
-    "push": "push.sh"
+    "push": "push.sh",
+    "deploy": "npm run build && npm run push"
   },
   "keywords": [
     "ga",
